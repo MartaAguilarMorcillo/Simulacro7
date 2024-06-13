@@ -157,10 +157,20 @@ const newProductPrice = async function (req, res) {
         const product = await Product.findByPk(pr.id)
         if (product.promote !== false) {
           const precio = (1 - (restaurant.discount / 100)) * product.price
+          // const precio = (1 - (restaurant.discount / 100)) * product.basePrice
           await Product.update({ price: precio }, { where: { id: product.id } })
-        }
+        } // else {
+        //    const precio = product.basePrice
+        //    await Product.update({ price: precio }, { where: { id: product.id } })
+        //   }
       }
-    }
+    } // else {
+    //    for (const pr of products) {
+    //      const product = await Product.findByPk(pr.id)
+    //      const precio = product.basePrice
+    //      await Product.update({ price: precio }, { where: { id: product.id } })
+    //    }
+    //   }
     const newProducts = await Product.findAll({
       where: {
         restaurantId: req.params.restaurantId
