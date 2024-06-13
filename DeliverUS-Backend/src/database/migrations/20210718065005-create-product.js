@@ -57,6 +57,11 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: new Date()
+      },
+      // SOLUCIÓN
+      promote: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       }
     })
   },

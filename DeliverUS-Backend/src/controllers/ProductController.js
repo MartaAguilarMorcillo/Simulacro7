@@ -107,12 +107,115 @@ const popular = async function (req, res) {
   }
 }
 
+// SOLUCIÓN
+const productInformation = async function (req, res) {
+  try {
+    const restaurant = await Restaurant.findByPk(req.params.restaurantId)
+    const product = await Product.findByPk(req.params.productId, {
+      include: [
+        {
+          model: ProductCategory,
+          as: 'productCategory'
+        }]
+    }
+    )
+    if (product.promote !== false) {
+      if (restaurant.discount !== 0) {
+        product.price = (1 - (restaurant.discount / 100)) * product.price
+        await product.save()
+      }
+    }
+    res.json(product)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}
+
+// SOLUCIÓN
+const productPromote = async function (req, res) {
+  try {
+    const product = await Product.findByPk(req.params.productId)
+    if (product.promote === true) {
+      await Product.update({ promote: false }, { where: { id: req.params.productId } })
+    } else {
+      await Product.update({ promote: true }, { where: { id: req.params.productId } })
+    }
+    const updatedProduct = await Product.findByPk(req.params.productId)
+    res.json(updatedProduct)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}
+
+// SOLUCIÓN
+const newProductPrice = async function (req, res) {
+  try {
+    const restaurant = await Restaurant.findByPk(req.params.restaurantId)
+    const products = await Product.findAll({ where: { restaurantId: req.params.restaurantId } })
+    if (restaurant.discount !== 0) {
+      for (const pr of products) {
+        const product = await Product.findByPk(pr.id)
+        if (product.promote !== false) {
+          const precio = (1 - (restaurant.discount / 100)) * product.price
+          await Product.update({ price: precio }, { where: { id: product.id } })
+        }
+      }
+    }
+    const newProducts = await Product.findAll({
+      where: {
+        restaurantId: req.params.restaurantId
+      },
+      include: [
+        {
+          model: ProductCategory,
+          as: 'productCategory'
+        }]
+    })
+    res.json(newProducts)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}
+
+// SOLUCIÓN
+const newIndexRestaurant = async function (req, res) {
+  try {
+    const restaurant = await Restaurant.findByPk(req.params.restaurantId)
+    const products = await Product.findAll({ where: { restaurantId: req.params.restaurantId } })
+    for (const pr of products) {
+      if (pr.promote !== false) {
+        if (restaurant.discount !== 0) {
+          pr.price = (1 - (restaurant.discount / 100)) * pr.price
+          await pr.save()
+        }
+      }
+    }
+    const newProducts = await Product.findAll({
+      where: {
+        restaurantId: req.params.restaurantId
+      },
+      include: [
+        {
+          model: ProductCategory,
+          as: 'productCategory'
+        }]
+    })
+    res.json(newProducts)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}
+
 const ProductController = {
   indexRestaurant,
   show,
   create,
   update,
   destroy,
-  popular
+  popular,
+  productInformation,
+  productPromote,
+  newIndexRestaurant,
+  newProductPrice
 }
 export default ProductController

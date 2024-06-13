@@ -50,10 +50,21 @@ const loadFileRoutes = function (app) {
       RestaurantMiddleware.checkRestaurantOwnership,
       OrderController.indexRestaurant)
 
+  // SOLUCIÓN
   app.route('/restaurants/:restaurantId/products')
     .get(
       checkEntityExists(Restaurant, 'restaurantId'),
       ProductController.indexRestaurant)
+    // ProductController.newIndexRestaurant)
+
+  // SOLUCIÓN
+  app.route('/restaurants/:restaurantId/productsPrice')
+    .patch(
+      isLoggedIn,
+      hasRole('owner'),
+      checkEntityExists(Restaurant, 'restaurantId'),
+      RestaurantMiddleware.checkRestaurantOwnership,
+      ProductController.newProductPrice)
 
   app.route('/restaurants/:restaurantId/analytics')
     .get(

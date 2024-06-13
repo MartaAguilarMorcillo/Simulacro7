@@ -22,9 +22,11 @@ const loadFileRoutes = (app) => {
     .get(
       ProductController.popular
     )
+  // SOLUCIÓN
   app.route('/products/:productId')
     .get(
       checkEntityExists(Product, 'productId'),
+      // ProductController.productInformation)
       ProductController.show)
     .put(
       isLoggedIn,
@@ -44,5 +46,13 @@ const loadFileRoutes = (app) => {
       ProductMiddleware.checkProductHasNotBeenOrdered,
       ProductController.destroy
     )
+    // SOLUCIÓN
+  app.route('/products/:productId/promote')
+    .patch(
+      isLoggedIn,
+      hasRole('owner'),
+      checkEntityExists(Product, 'productId'),
+      ProductMiddleware.checkProductOwnership,
+      ProductController.productPromote)
 }
 export default loadFileRoutes
